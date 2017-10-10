@@ -1,0 +1,22 @@
+{
+  "name": "alexaprof",
+  "version": "1.0.0",
+  "description": "tester",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrchan64/Alexa-Profanity.git"
+  },
+  "author": "mrchan64",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mrchan64/Alexa-Profanity/issues"
+  },
+  "homepage": "https://github.com/mrchan64/Alexa-Profanity#readme",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
