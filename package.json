@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/mrchan64/Alexa-Profanity#readme",
   "dependencies": {
-    "alexa-sdk": "^1.0.14",
+    "alexa-app": "^4.2.0",
     "express": "^4.16.2"
   }
 }
