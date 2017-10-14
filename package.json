@@ -18,6 +18,7 @@
   "homepage": "https://github.com/mrchan64/Alexa-Profanity#readme",
   "dependencies": {
     "alexa-app": "^4.2.0",
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "ytdl-core": "^0.18.1"
   }
 }
