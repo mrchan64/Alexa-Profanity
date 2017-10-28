@@ -3,4 +3,4 @@ var EXE = require('./lib/expressEndpoint'),
     YTA = require('./lib/alexaYoutube');
 
 AXE.installExpress(EXE.app, 'profanity');
-YTA.installExpress(EXE.app, 'youtube');
+YTA.installExpress(EXE.app, 'youtube', EXE.wssconns);
