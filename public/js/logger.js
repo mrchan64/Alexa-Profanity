@@ -2,7 +2,8 @@ var logger = {};
 logger.el = $('#messagecont');
 logger.el2 = $('#compactviewer');
 
-logger.link = "ws://"+window.location.host+"/ytstatus/info";
+logger.protocol = window.location.protocol=='http:' ? 'ws:' : 'wss:';
+logger.link = logger.protocol+'//'+window.location.host+"/ytstatus/info";
 logger.comm = new WebSocket(logger.link);
 logger.heartRate = 1000;
 
