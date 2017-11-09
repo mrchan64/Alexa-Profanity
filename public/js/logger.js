@@ -5,7 +5,6 @@ logger.el2 = $('#compactviewer');
 logger.protocol = window.location.protocol=='http:' ? 'ws:' : 'wss:';
 logger.link = logger.protocol+'//'+window.location.host+"/ytstatus/info";
 logger.comm = new WebSocket(logger.link);
-logger.heartRate = 1000;
 
 logger.comm.onopen = function(event){
   logger.comm.send(JSON.stringify({
@@ -106,6 +105,7 @@ logger.comm.onmessage = function(event) {
   if(data.log)data.log = logger.cleanse(data.log);
   switch(data.type){
     case 'heartbeat':
+      display.procHeartbeat(data);
       break;
     case 'consolelog':
       logger.log(data);
@@ -117,16 +117,6 @@ logger.comm.onmessage = function(event) {
       logger.error(data);
       break;
   }
-}
-
-logger.checkForCardiacArrest = function(){
-  if(logger.ca)clearTimeout(logger.ca);
-  logger.lastHeartBeat = new Date().getTime();
-  logger.ca = setTimeout(()=>{
-    if(new Date().getTime()>logger.lastHeartBeat+logger.heartRate*4){
-      //heart failure
-    }
-  }, logger.heartRate*5);
 }
 
 logger.cleanse = function(str){

@@ -8,8 +8,19 @@ html
     link(href='css/style.css', rel='stylesheet')
     link(href="https://fonts.googleapis.com/css?family=Ubuntu", rel="stylesheet")
     script(src="/js/jquery.min.js")
+    script(src="/js/jquery-ui.min.js")
   body
-    #compactviewer
-    #logviewer
-        #messagecont
+    #queues
+        #placeholder
+            |No Active Queues
+        #tabmenu
+            #tabbar
+                #bottomline(style="position:absolute;height:1px;width:100%;background-color:#aaaaaa;bottom:0;z-index:2")
+            #display
+    #loggers
+        #compactviewer
+        #logviewer
+            #messagecont
+    script(src="/js/scaleHandler.js")
     script(src="/js/logger.js")
+    script(src="/js/queueDisplay.js")
