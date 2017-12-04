@@ -1,6 +1,8 @@
 var logger = {};
 logger.el = $('#messagecont');
 logger.el2 = $('#compactviewer');
+logger.uptime = {};
+logger.uptime.el = $('#uptime');
 
 logger.protocol = window.location.protocol=='http:' ? 'ws:' : 'wss:';
 logger.link = logger.protocol+'//'+window.location.host+"/ytstatus/info";
@@ -9,8 +11,63 @@ logger.comm = new WebSocket(logger.link);
 logger.comm.onopen = function(event){
   logger.comm.send(JSON.stringify({
     'type':'fillgap',
-    'time': 0
-  }))
+    'time': logger.reconnect.lastDisconnect
+  }));
+  logger.reconnect.el.html('Successfully reconnected!');
+  logger.reconnect.el.css({
+    'background-color': 'rgba(0, 150, 0, .5)'
+  })
+  logger.reconnect.el.animate({
+    'opacity': 0
+  },3000);
+  logger.reconnect.attempting = false;
+}
+
+logger.comm.onclose = function(event){
+  if(!logger.reconnect.attempting){
+    logger.reconnect.attempting = true;
+    logger.reconnect.lastDisconnect = new Date();
+    logger.reconnect.interval = 4;
+  }
+  logger.reconnect.try();
+}
+
+logger.reconnect = {};
+logger.reconnect.el = $('#disconnect');
+logger.reconnect.lastDisconnect = 0;
+logger.reconnect.attempting = false;
+logger.reconnect.interval = 4;
+logger.reconnect.counter = 0;
+
+logger.reconnect.try = function() {
+  logger.reconnect.el.stop();
+  logger.reconnect.el.css({
+    'background-color': 'rgba(255, 0, 0, .5)',
+    'opacity': 1
+  });
+  var time = logger.reconnect.lastDisconnect;
+  if(logger.reconnect.counter == 0){
+    if(logger.reconnect.interval<10){
+      logger.reconnect.interval+=1;
+    }else if(logger.reconnect.interval<1800000){
+      logger.reconnect.interval*=2;
+    }
+  }
+  var diff = logger.reconnect.interval-logger.reconnect.counter;
+  (String(time.getMinutes()).length<2?'0':'')
+  if(diff>0){
+    logger.reconnect.el.html('Disconnected from '+logger.link+' at '+time.getHours()%12+':'+(String(time.getMinutes()).length<2?'0':'')+time.getMinutes()+':'+(String(time.getSeconds()).length<2?'0':'')+time.getSeconds()+(Math.floor(time.getHours()/12)?' pm':' am')+' on '+(time.getMonth()+1)+'/'+time.getDate()+'/'+time.getFullYear()+'. Attempting to reconnect in '+(diff<60?(diff+' seconds.'):(Math.floor(diff/60)+' minutes.')))
+    logger.reconnect.counter++;
+    setTimeout(logger.reconnect.try, 1000);
+  }else{
+    var comm = new WebSocket(logger.link);
+    comm.onopen = logger.comm.onopen;
+    comm.onclose = logger.comm.onclose;
+    comm.onmessage = logger.comm.onmessage;
+    logger.comm = comm;
+    logger.reconnect.el.html('Disconnected from '+logger.link+' at '+time.getHours()%12+':'+(String(time.getMinutes()).length<2?'0':'')+time.getMinutes()+':'+(String(time.getSeconds()).length<2?'0':'')+time.getSeconds()+(Math.floor(time.getHours()/12)?' pm':' am')+' on '+(time.getMonth()+1)+'/'+time.getDate()+'/'+time.getFullYear()+'. Attempting to reconnect...')
+    logger.reconnect.counter = 0;
+  }
 }
 
 logger.log = function(struct){
@@ -102,7 +159,9 @@ logger.updateHeight = function(elem, smooth) {
 
 logger.comm.onmessage = function(event) {
   var data = JSON.parse(event.data);
+  logger.uptime.update(data.uptime);
   if(data.log)data.log = logger.cleanse(data.log);
+  keyload.updateKeyDiv(data.keys);
   switch(data.type){
     case 'heartbeat':
       display.procHeartbeat(data);
@@ -136,3 +195,25 @@ logger.cleanse = function(str){
   str = str.replace(/\n/g,'<b'+'r>');
   return str;
 }
+
+logger.show = function(show) {
+  $('#loggers').css({
+    'opacity': show ? 1 : 0,
+    'pointer-events': show ? 'all' : 'none'
+  })
+}
+
+logger.uptime.update = function(uptime){
+  if(logger.uptime.time != uptime && uptime){
+    var time = logger.uptime.time = uptime;
+    time = new Date(time);
+    logger.uptime.el.html('Server has been up since '+time.getHours()%12+':'+(String(time.getMinutes()).length<2?'0':'')+time.getMinutes()+':'+(String(time.getSeconds()).length<2?'0':'')+time.getSeconds()+(Math.floor(time.getHours()/12)?' pm':' am')+' on '+(time.getMonth()+1)+'/'+time.getDate()+'/'+time.getFullYear()+'.');
+  }
+}
+
+logger.uptime.scale = function(){
+  logger.uptime.el.css('font-size', $(window).height()*.015+'px');
+}
+logger.uptime.scale();
+
+scales.push(logger.uptime.scale);

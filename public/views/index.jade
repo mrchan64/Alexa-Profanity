@@ -15,12 +15,32 @@ html
             |No Active Queues
         #tabmenu
             #tabbar
-                #bottomline(style="position:absolute;height:1px;width:100%;background-color:#aaaaaa;bottom:0;z-index:2")
+                #bottomline(style="position:absolute;height:1px;width:100%;background-color:#aaaaaa;bottom:0;z-index:1")
             #display
     #loggers
+        #uptime
         #compactviewer
         #logviewer
             #messagecont
+    #contextmenu
+    #disconnect
+    #keyload
+        #content
+            h1
+            p
+                |Input a video or (playlist still wip) url to create a key that can be loaded from Alexa using the command "Alexa ask youtube to load {key}".  It may take the server a second or two to process your key, so please wait for the available keys to show up below.
+            input(placeholder="Youtube Link")
+            button
+                |Submit
+            #list
+        #tab
+            #circle
+                span#triangle
+        #close
+            |&#215;
+
     script(src="/js/scaleHandler.js")
     script(src="/js/logger.js")
     script(src="/js/queueDisplay.js")
+    script(src="/js/context.js")
+    script(src="/js/keyLoad.js")

@@ -1,6 +1,8 @@
 var display = {};
 display.queues = {};
 display.numtabs = 0;
+display.taborder = [];
+display.tabscrollval = 0;
 
 display.addTestQueue = function(title) {
   var session = "";
@@ -32,7 +34,7 @@ display.procHeartbeat = function(data){
     changed = changed || display.queues[info.session].position != info.position || display.queues[info.session].paused != info.paused;
     for(var i = 0; i<info.queue.length; i++){
       if(changed)break;
-      changed = changed || !display.queues[info.session].queue[i] || display.queues[info.session].queue[i].id!=info.queue[i].id;
+      changed = changed || !display.queues[info.session].queue[i] || display.queues[info.session].queue[i].id!=info.queue[i].id || display.queues[info.session].queue[i].time!=info.queue[i].time;
     }
     display.queues[info.session].position = info.position;
     display.queues[info.session].paused = info.paused;
@@ -71,19 +73,27 @@ display.updateDiv = function(session) {
   display.queues[session].queuelist.empty();
   var counter = 0;
   display.queues[session].queue.forEach(function(item){
-    var queueitem = $('<p/>');
-    queueitem.css({
-    })
+    var queueitem = $('<p class="title"/>');
+    var queuetime = $('<p class="time"/>');
+    var queueitemcont = $('<div class="queue-item-container"/>');
     queueitem.html(item.title);
+    var time = item.time;
+    var timestring = (Math.floor(time/3600)?(Math.floor(time/3600)+':'):'')+(Math.floor(time/3600)&&Math.floor((time%3600)/60)<10?'0':'')+(Math.floor(time/3600)||Math.floor((time%3600)/60)?(Math.floor((time%3600)/60)+':'):'')+(Math.floor(time/3600)||Math.floor((time%3600)/60)&&Math.floor(time%60)<10?('0'+Math.floor((time%60))):Math.floor((time%60)));
+    queuetime.html(timestring);
     if(counter<display.queues[session].position){
-      queueitem.css('color', '#aaaaaa');
+      queueitemcont.css('color', '#aaaaaa');
     }else if(counter==display.queues[session].position){
-      queueitem.css('color', '#33dd33');
-      queueitem.attr('id', 'current');
+      queueitemcont.css('color', '#33dd33');
+      queueitemcont.attr('id', 'current');
     }else{
-      queueitem.css('color', '#222222');
+      queueitemcont.css('color', '#222222');
     }
-    display.queues[session].queuelist.append(queueitem);
+    queueitemcont.append(queueitem, queuetime);
+    queueitemcont.on('mousedown', ()=>{
+      var link = 'https://www.youtube.com/watch?v='+item.id;
+      window.open(link);
+    })
+    display.queues[session].queuelist.append(queueitemcont);
     counter++;
   });
   display.updatePointer(session);
@@ -91,13 +101,11 @@ display.updateDiv = function(session) {
 }
 
 display.addTab = function(session) {
-  var sidemarg = 20;
   var tab = $('<div class="tab-chooser inactive"/>');
   shortsession = session.substring(session.length-10);
   tab.html(shortsession);
   var underline = $('<div class="underline"/>');
   tab.append(underline);
-  tab.css('left', Object.keys(display.queues).length*250-250+sidemarg);
   $('#tabbar').append(tab);
   var padding = $('<div/>');
   padding.css({
@@ -109,6 +117,8 @@ display.addTab = function(session) {
     'background-color': 'inherit',
     'z-index': 2
   })
+  var sidemarg = 20;
+  tab.css('left', sidemarg);
   tab.append(padding);
   display.queues[session].tab = tab;
   display.queues[session].active = false;
@@ -127,6 +137,7 @@ display.addTab = function(session) {
       underline.animate({'width':'0px'},200);
     }
   });
+  display.taborder.push(session);
   if(display.numtabs == 0){
     $('#placeholder').css('display', 'none');
     $('#tabmenu').css({
@@ -135,6 +146,8 @@ display.addTab = function(session) {
     })
     display.changeToTab(session);
   }
+  if(display.numtabs == 0) display.tabUpdatePosition();
+  else display.tabUpdatePosition(true);
   display.numtabs++;
 }
 
@@ -156,6 +169,24 @@ display.changeToTab = function(session) {
   var underline = display.queues[session].tab.find('.underline');
   underline.stop();
   underline.css('width', '0px');
+
+  var sidemarg = 20;
+  var tabwidth = 250;
+  var revealwidth = 40;
+  var index = display.taborder.indexOf(session);
+  var original = index*tabwidth;
+  var scrolled = original-display.tabscrollval;
+  var minpos = revealwidth*index;
+  var maxpos = $('#tabbar').width()-sidemarg*2-tabwidth-revealwidth*(display.taborder.length-index-1)/3;
+  if(scrolled>maxpos){
+    display.tabscrollval+=(scrolled-maxpos);
+    display.tabUpdatePosition(true);
+  }
+  if(scrolled<minpos){
+    console.log(scrolled, minpos)
+    display.tabscrollval-=(minpos-scrolled);
+    display.tabUpdatePosition(true);
+  }
 }
 
 display.updatePointer = function(session) {
@@ -165,6 +196,60 @@ display.updatePointer = function(session) {
   var top = bound.top-outer.top+(bound.height-12)/2;
   display.queues[session].el.find('.queue-pointer').css('height', outer.height);
   display.queues[session].el.find('.caret').animate({top: top}, 500);
+}
+
+display.tabScroll = function(event) {
+  var dir = event.originalEvent.deltaY;
+  var scrollspeed = 30;
+  var sidemarg = 20;
+  var tabwidth = 250;
+  if($('#tabbar').width()-sidemarg*2<display.taborder.length*tabwidth){
+    var minval = 0;
+    var maxval = display.taborder.length*tabwidth-($('#tabbar').width()-sidemarg*2);
+    display.tabscrollval=dir>0?display.tabscrollval-scrollspeed:display.tabscrollval+scrollspeed;
+    if(display.tabscrollval<minval)display.tabscrollval = minval;
+    if(display.tabscrollval>maxval)display.tabscrollval = maxval;
+  }
+  display.tabUpdatePosition();
+}
+
+display.tabUpdatePosition = function(animate) {
+  var sidemarg = 20;
+  var tabwidth = 250;
+  var revealwidth = 40;
+
+  display.taborder.forEach((session, index)=>{
+    var original = index*tabwidth;
+    var scrolled = original-display.tabscrollval;
+    var minpos = revealwidth*index;
+    var maxpos = $('#tabbar').width()-sidemarg*2-tabwidth-revealwidth*(display.taborder.length-index-1)/3;
+    var pos = scrolled;
+    var z = display.taborder.length+index;
+    if(scrolled<minpos){
+      pos = minpos;
+    }
+    if(scrolled>=minpos+tabwidth-revealwidth){
+      z = display.taborder.length-index;
+    }
+    if(scrolled>maxpos){
+      pos = maxpos;
+    }
+    pos+=sidemarg;
+    if(animate){
+      display.queues[session].tab.stop();
+      display.queues[session].tab.animate({
+        'left': pos
+      },200);
+      display.queues[session].tab.css({
+        'z-index': z
+      });
+    }else{
+      display.queues[session].tab.css({
+        'left': pos,
+        'z-index': z
+      });
+    }
+  })
 }
 
 display.scale = function() {
@@ -184,4 +269,12 @@ display.scale = function() {
   })
 }
 
+display.show = function(show) {
+  $('#queues').css({
+    'opacity': show ? 1 : 0,
+    'pointer-events': show ? 'all' : 'none'
+  })
+}
+
 scales.push(display.scale)
+$('#tabbar').on('wheel',display.tabScroll);

@@ -140,6 +140,14 @@ body {
   color: #22ddff;
 }
 
+#uptime {
+  position: absolute;
+  height: auto;
+  width: auto;
+  top: .5%;
+  left: 2.5%;
+}
+
 /* queues */
 #queues {
   position: absolute;
@@ -162,6 +170,7 @@ body {
   color: #999999;
   font-size: 40px;
   pointer-events: none;
+  user-select: none;
 }
 
 #tabmenu {
@@ -178,8 +187,7 @@ body {
   position: relative;
   height: 45px;
   width: 100%;
-  overflow-y: hidden;
-  overflow-x: scroll;
+  overflow: hidden;
 }
 
 .tab-chooser {
@@ -191,7 +199,6 @@ body {
   width: 230px;
   cursor: pointer;
   border: 1px solid #aaaaaa;
-  border-bottom: 0;
   font-size: 20px;
   font-weight: bold;
   color: #555555;
@@ -210,8 +217,8 @@ body {
 .tab-chooser.active {
   background-color: white;
   color: #ffcc00;
-  z-index: 3;
   cursor: default;
+  border-bottom: 1px solid white;
 }
 
 .tab-chooser .underline {
@@ -275,7 +282,35 @@ body {
   position: relative;
   display: inline-block;
   vertical-align: top;
-  max-width: 75%;
+  width: 90%;
+}
+
+.queue-item-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  user-select: none;
+  cursor: pointer;
+}
+.queue-item-container:hover {
+  background-color: #eeeeee;
+}
+
+.queue-item-container p.title {
+  margin: 0;
+  margin-right: 100px;
+}
+
+.queue-item-container p.time {
+  margin: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: auto;
+  text-align: right;
 }
 
 .caret {
@@ -287,4 +322,201 @@ body {
   border-bottom: 6px solid transparent;
   border-left: 12px solid #33dd33;
   white-space: nowrap;
+}
+
+/* context menu */
+#contextmenu {
+  position: absolute;
+  height: 0;
+  font-size: 12px;
+  color: black;
+  background-color: white;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 3px 3px 0px 0px rgba(0,0,0,.75);
+  border: 1px solid #aaaaaa;
+}
+
+#contextmenu .item {
+  position: relative;
+  white-space: none;
+  padding: 12px;
+  border-bottom: 1px solid #aaaaaa;
+  user-select: none;
+  cursor: pointer;
+}
+#contextmenu .item:hover {
+  background-color: #dddddd;
+}
+
+/* disconnect */
+#disconnect {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 99;
+  white-space: none;
+  padding: 2px 10px;
+  color: white;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* key stuff */
+#keyload {
+  position: absolute;
+  height: 100%;
+  width: 40%;
+  top: 0%;
+  left: 60%;
+  background-color: white;
+  z-index: 98;
+  border-left: 1px solid #aaaaaa;
+  box-shadow: 20px 0px 31px 19px rgba(0,0,0,0.6);
+}
+
+#keyload #tab {
+  position: absolute;
+  padding: 7px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border: 1px solid #aaaaaa;
+  background-color: white;
+  border-right: 0px;
+  right: 100%;
+  bottom: 10%;
+  cursor: pointer;
+}
+
+#keyload #tab #circle {
+  position: relative;
+  background-color: #aaaaaa;
+  height: 30px;
+  width: 30px;
+  border-radius: 100%;
+  text-indent: 180px;
+  transform: rotate(540deg);
+}
+
+#keyload #tab #circle span#triangle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-right: 10px solid white;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  top: 8px;
+  left: 9px;
+}
+
+#keyload #close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: #aaaaaa;
+  font-size: 40px;
+  padding-top: 0px;
+  padding-bottom: 5px;
+  padding-left: 12px;
+  padding-right: 12px;
+  background-color: white;
+  user-select: none;
+  cursor: pointer;
+  white-space: none;
+}
+#keyload #close:hover {
+  color: white;
+  background-color: #aaaaaa;
+}
+
+#keyload #content {
+  position: relative;
+  margin: 0 auto;
+  width: 70%;
+  height: 100%;
+}
+
+#keyload #content h1 {
+  position: relative;
+  padding-top: 40%;
+  margin: 0px;
+  color: #555555;
+}
+#keyload #content h1 span {
+  color: #ffcc00;
+}
+
+#keyload #content p {
+  margin-top: 5%;
+  color: #555555;
+}
+
+#keyload #content input {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #aaaaaa;
+  padding: 5px 10px;
+  color: #555555;
+}
+
+#keyload #content button {
+  display: inline-block;
+  color: white;
+  background-color: #ffcc00;
+  padding: 7px 15px;
+  font-size: 16px;
+  white-space: nowrap;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  margin-left: 20px;
+}
+#keyload #content button:hover {
+  background-color: #eebb00;
+}
+#keyload #content button:active {
+  background-color: #ddaa00;
+}
+
+#keyload #list {
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+#keyload p.list-item {
+  margin-top: 0 !important;
+  margin-bottom: ;
+  white-space: nowrap;
+}
+
+#keyload p.list-item span {
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+::-webkit-input-placeholder {
+  font-family: 'Ubuntu', sans-serif;
+  color: #aaaaaa;
+}
+:-moz-placeholder {
+  font-family: 'Ubuntu', sans-serif;
+  color: #aaaaaa;
+}
+::-moz-placeholder {
+  font-family: 'Ubuntu', sans-serif;
+  color: #aaaaaa;
+}
+:-ms-input-placeholder {
+  font-family: 'Ubuntu', sans-serif;
+  color: #aaaaaa;
+}
+::placeholder {
+  font-family: 'Ubuntu', sans-serif;
+  color: #aaaaaa;
 }
