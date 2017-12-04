@@ -149,4 +149,4 @@ window.onkeyup = function(e) {
   }
 }
 
-//setTimeout(keyload.closeTab, 500);
+setTimeout(keyload.closeTab, 500);
